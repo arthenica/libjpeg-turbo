@@ -496,6 +496,7 @@ static void _decompTest(tjhandle handle, unsigned char *jpegBuf,
   tjhandle handle2 = NULL;
 
   TRY_TJ(handle, tj3SetScalingFactor(handle, sf));
+  TRY_TJ(handle, tj3Set(handle, TJPARAM_FASTDCT, 0));
 
   TRY_TJ(handle, tj3DecompressHeader(handle, jpegBuf, jpegSize));
   _hdrw = tj3Get(handle, TJPARAM_JPEGWIDTH);
@@ -519,6 +520,12 @@ static void _decompTest(tjhandle handle, unsigned char *jpegBuf,
       THROW_TJ(NULL);
     TRY_TJ(handle2, tj3Set(handle2, TJPARAM_BOTTOMUP, bottomUp));
     TRY_TJ(handle2, tj3Set(handle2, TJPARAM_SUBSAMP, subsamp));
+
+    /* This should have no effect, but it will cause libjpeg-turbo 3.0.4 and
+       prior to produce incorrect chrominance values when decompressing a
+       4:2:0 JPEG image with a scaling factor of 1/2. */
+    if (sf.num != 1 || sf.denom != 1)
+      TRY_TJ(handle, tj3Set(handle, TJPARAM_FASTDCT, 1));
 
     if ((yuvBuf = (unsigned char *)malloc(yuvSize)) == NULL)
       THROW("Memory allocation failure");
