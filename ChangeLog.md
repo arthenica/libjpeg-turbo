@@ -38,6 +38,11 @@ jpegtran application and thus did not pose a security risk.
 attempting to use `tj3LoadImage12()` or `tj3LoadImage16()` from a 32-bit build
 of libjpeg-turbo to load a packed-pixel image with more than 2^31 components.
 
+5. Fixed an issue whereby `tj3DecompressToYUV*()` produced incorrect
+chrominance values when decompressing a 4:2:0 JPEG image with the "fast" IDCT
+algorithm and a scaling factor of 1/2.  (In other words, `TJPARAM_FASTDCT` was
+not ignored as it should be when decompression scaling is enabled.)
+
 
 3.1.4.1
 =======
